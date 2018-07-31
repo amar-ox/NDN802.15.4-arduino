@@ -24,7 +24,7 @@
 
 #include "ndn.h"
 #include "pending-interest-table.h"
-#include "forwarding-interest-base.h"
+#include "forwarding-information-base.h"
 #include "ndn-802154.h"
 #include "content-store.h"
 
@@ -40,10 +40,10 @@
 #define INTEREST_TYPE 0x05
 #define DATA_TYPE 0x06
 
-#define DEFER_SLOT_TIME 0.028 // in ms
-#define DW 1023
+#define DEFER_SLOT_TIME 0.032 // in ms
+#define DW 127
 
-#define M 9.
+#define M 5.
 #define S 3.5
 
 class Node 
@@ -61,7 +61,7 @@ class Node
   /* issue an (encoded) Interest with a callback method */
   //void expressInterest(uint8_t* encodedInterest, uint8_t interestLength);
 
-  /* forward Interest with iLNFS strategy */
+  /* forward Interest with R-LF strategy */
   void forwardInterest(NdnPacket* interestCopy);
   
   /* */
@@ -86,14 +86,14 @@ class Node
   ~Node(){}
 
   private:
-  /* iLNFS stuff: compute deterministic delay time */
+  /* R-LF stuff: compute deterministic delay time */
   unsigned int computeDelayPhi(float a)
   {
     unsigned int delay = (unsigned int) (M / exp(a / 2.) + S) ;    
     return delay;
   }
 
-  /* iLNFS stuff: compute random delay time */
+  /* R-LF stuff: compute random delay time */
   unsigned int computeDelayRandom()
   {
     unsigned int delay = (unsigned int) ((DW + random(0, DW)) * DEFER_SLOT_TIME);    
@@ -108,7 +108,7 @@ class Node
 
   Name* prefix_ = 0;
   PendingInterestTable pit_ = PendingInterestTable ();
-  ForwardingInterestBase fib_ = ForwardingInterestBase ();
+  ForwardingInformationBase fib_ = ForwardingInformationBase ();
   ContentStore cs_ = ContentStore ();
   IEEE802154 radio_ = IEEE802154 ();
   OnData onData_;
